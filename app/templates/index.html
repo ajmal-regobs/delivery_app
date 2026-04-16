@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Delivery App</title>
+  <style>
+    body { font-family: -apple-system, system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+    h1 { margin-bottom: 0.25rem; }
+    .muted { color: #666; margin-top: 0; }
+    form.add { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1.5rem 0; }
+    form.add input, form.add select { padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+    form.add button { grid-column: 1 / -1; padding: 0.6rem; background: #2563eb; color: white; border: 0; border-radius: 4px; cursor: pointer; }
+    form.add button:hover { background: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #eee; }
+    th { background: #f7f7f7; }
+    .status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; background: #eef; }
+    button.del { background: #dc2626; color: white; border: 0; padding: 0.35rem 0.6rem; border-radius: 4px; cursor: pointer; }
+    button.del:hover { background: #b91c1c; }
+    .empty { color: #888; text-align: center; padding: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Delivery App</h1>
+  <p class="muted">Track deliveries: add, remove, and list.</p>
+
+  <form class="add" action="/ui/deliveries" method="post">
+    <input name="recipient" placeholder="Recipient" required />
+    <input name="address" placeholder="Address" required />
+    <input name="item" placeholder="Item" required />
+    <select name="status">
+      <option value="pending">pending</option>
+      <option value="in_transit">in_transit</option>
+      <option value="delivered">delivered</option>
+      <option value="cancelled">cancelled</option>
+    </select>
+    <button type="submit">Add delivery</button>
+  </form>
+
+  {% if deliveries %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Recipient</th>
+        <th>Address</th>
+        <th>Item</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in deliveries %}
+      <tr>
+        <td>{{ d.id }}</td>
+        <td>{{ d.recipient }}</td>
+        <td>{{ d.address }}</td>
+        <td>{{ d.item }}</td>
+        <td><span class="status">{{ d.status }}</span></td>
+        <td>{{ d.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          <form action="/ui/deliveries/{{ d.id }}/delete" method="post" onsubmit="return confirm('Remove delivery #{{ d.id }}?');">
+            <button class="del" type="submit">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No deliveries yet. Add one above.</p>
+  {% endif %}
+</body>
+</html>
